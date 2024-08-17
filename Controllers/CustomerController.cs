@@ -8,7 +8,7 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 namespace ESGAPI.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("customer")]
     public class CustomerController : ControllerBase
     {
         private readonly ILogger<CustomerController> _logger;
@@ -87,19 +87,8 @@ namespace ESGAPI.Controllers
                 }
             }
         }
-/*
-  {
-  "customerRef": "012255",
-  "customerName": "Sarah Campbell Jones",
-  "addressLine1": "15, Albany Street",
-  "addressLine2": "Burton Road",
-  "town": "Lincoln",
-  "county": "Lincs",
-  "country": "GB",
-  "postcode": "LN13HY"
-}
-*/
-    [HttpPost]
+
+        [HttpPost] 
         public ActionResult<Customer> Post(Customer customer)
         {
             try
