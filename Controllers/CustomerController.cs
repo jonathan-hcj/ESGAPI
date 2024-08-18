@@ -2,9 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using System.Data;
-using System.Data.Common;
-using System.Linq.Expressions;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace ESGAPI.Controllers
 {
@@ -13,6 +10,14 @@ namespace ESGAPI.Controllers
     public class CustomerController : ControllerBase
     {
         private readonly ILogger<CustomerController> _logger;
+        private readonly SqlConnectionStringBuilder builder = new()
+        {
+            DataSource = "JONATHANS_LT\\SQLEXPRESS",
+            UserID = "API1",
+            Password = "Blat",
+            InitialCatalog = "ESG",
+            TrustServerCertificate = true
+        };
 
         public CustomerController(ILogger<CustomerController> logger)
         {
@@ -30,15 +35,6 @@ namespace ESGAPI.Controllers
             {
                 try
                 {
-                    var builder = new SqlConnectionStringBuilder
-                    {
-                        DataSource = "JONATHANS_LT\\SQLEXPRESS",
-                        UserID = "API1",
-                        Password = "Blat",
-                        InitialCatalog = "ESG",
-                        TrustServerCertificate = true
-                    };
-
                     var sql = 
                         "SELECT TOP 1   CustomerRef, " +
                         "               CustomerName," +
@@ -94,14 +90,12 @@ namespace ESGAPI.Controllers
         {
             try
             {
-                var builder = new SqlConnectionStringBuilder
+                /* ensure then no insert is attempted without a primary key */
+                if (String.IsNullOrWhiteSpace(customer.CustomerRef))
                 {
-                    DataSource = "JONATHANS_LT\\SQLEXPRESS",
-                    UserID = "API1",
-                    Password = "Blat",
-                    InitialCatalog = "ESG",
-                    TrustServerCertificate = true
-                };
+                    return StatusCode(StatusCodes.Status400BadRequest,
+                        $"Customer has no reference specified");
+                }
 
                 var sql =
                     "DECLARE @exists BIT = CASE WHEN EXISTS(SELECT CustomerRef FROM Customer WHERE CustomerRef = @customerref) THEN 1 ELSE 0 END " +
