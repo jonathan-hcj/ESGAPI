@@ -29,9 +29,10 @@ namespace ESGAPI
             if (Request.Path.Value!= null && Request.Path.Value.StartsWith("/swagger"))
             {
 
-                var claims = new[] { new Claim("name", "bill"), new Claim(ClaimTypes.Role, "Admin") };
+                var claims = new[] { new Claim("name", userName), new Claim(ClaimTypes.Role, "Admin") };
                 var identity = new ClaimsIdentity(claims, "Basic");
                 var claimsPrincipal = new ClaimsPrincipal(identity);
+
                 return Task.FromResult(AuthenticateResult.Success(new AuthenticationTicket(claimsPrincipal, Scheme.Name)));
             }
             else

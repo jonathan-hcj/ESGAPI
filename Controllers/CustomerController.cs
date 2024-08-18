@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using System.Data;
 using System.Data.Common;
+using System.Linq.Expressions;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace ESGAPI.Controllers
@@ -103,7 +104,13 @@ namespace ESGAPI.Controllers
                 };
 
                 var sql =
-                    "INSERT INTO Customer (CustomerRef, " +
+                    "DECLARE @exists BIT = CASE WHEN EXISTS(SELECT CustomerRef FROM Customer WHERE CustomerRef = @customerref) THEN 1 ELSE 0 END " +
+                    "" +
+                    "IF @exists = 1 " +
+                    "SELECT 2 " + 
+                    "ELSE " +
+                    "BEGIN" +
+                    "   INSERT INTO Customer (CustomerRef, " +
                     "               CustomerName," +
                     "               AddressLine1," +
                     "               AddressLine2," +
@@ -111,7 +118,9 @@ namespace ESGAPI.Controllers
                     "               County," +
                     "               Country," +
                     "               Postcode)" +
-                    "VALUES (@customerref, @customername, @addressLine1, @addressLine2, @town, @county, @county, @postcode) ";
+                    "   VALUES      (@customerref, @customername, @addressLine1, @addressLine2, @town, @county, @country, @postcode) " +
+                    "   SELECT @@ROWCOUNT " +
+                    "END ";
 
                 var connection = new SqlConnection(builder.ConnectionString);
                 connection.Open();
@@ -141,17 +150,31 @@ namespace ESGAPI.Controllers
                 command.Parameters.Add("@postcode", SqlDbType.NVarChar);
                 command.Parameters["@postcode"].Value = customer.Postcode;
 
-                var reader = command.ExecuteNonQuery();
+                var result = Convert.ToInt32(command.ExecuteScalar());
 
-                return CreatedAtAction(nameof(Get),
-                    new { id = customer.CustomerRef }, null);
+                switch(result)
+                {
+                    case 0:
+                        return StatusCode(StatusCodes.Status400BadRequest,
+                            $"Customer record could not be inserted");
+
+                    case 2:
+                        return StatusCode(StatusCodes.Status400BadRequest,
+                            $"Customer account already exists");
+
+                    default:
+                        return CreatedAtAction(nameof(Get),
+                            new { id = customer.CustomerRef }, null);
+                }
             }
 
-            catch (Exception)
+            catch (Exception e)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error creating new customer record");
+                    $"Error creating new customer record: {e.Message}");
             }
         }
+
+
     }
 }
