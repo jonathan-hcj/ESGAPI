@@ -1,9 +1,12 @@
-﻿using System.Net;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Net;
 
-namespace ESGAPI
+namespace ESGAPI.Entities
 {
     public class Customer
     {
+        [Key]
         public string? CustomerRef { get; set; }
         public string? CustomerName { get; set; }
         public string? AddressLine1 { get; set; }
