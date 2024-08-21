@@ -1,34 +1,16 @@
 ﻿using ESGAPI.Contexts;
 using ESGAPI.Entities;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
-using System.Data;
 using System.Data.Entity.Infrastructure;
 
 namespace ESGAPI.Controllers
 {
     [ApiController]
     [Route("customer")]
-    public class CustomerController : ControllerBase
+    public class CustomerController(IConfiguration configuration, CustomerDbContext context) : ControllerBase
     {
-        private readonly CustomerDbContext customerDbContext = new();
-        private readonly ILogger<CustomerController> _logger;
-        private readonly SqlConnectionStringBuilder builder = new()
-        {
-            DataSource = "JONATHANS_LT\\SQLEXPRESS",
-            UserID = "API1",
-            Password = "Blat",
-            InitialCatalog = "ESG",
-            TrustServerCertificate = true
-        };
-
-        public CustomerController(ILogger<CustomerController> logger)
-        {
-            _logger = logger;
-
-            customerDbContext.Database.EnsureCreated();
-        }
+        private readonly CustomerDbContext customerDbContext = context;
+        private readonly IConfiguration configuration = configuration;
 
         [HttpGet(Name = "{reference}")]
         public  ActionResult<Customer> Get(string reference)
@@ -80,7 +62,5 @@ namespace ESGAPI.Controllers
                     $"Error creating new customer record: {e.Message}");
             }
         }
-
-
     }
 }

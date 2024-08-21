@@ -22,8 +22,8 @@ namespace ESGAPI
         // in large part lifted from https://anuraj.dev/blog/implementing-basic-authentication-in-minimal-webapi/
         protected override Task<AuthenticateResult> HandleAuthenticateAsync()
         {
-            string userName = ConfigurationManager.AppSetting["Security:UserName"];
-            string password = ConfigurationManager.AppSetting["Security:Password"];
+            string? userName = ConfigurationManager.AppSetting["Security:UserName"];
+            string? password = ConfigurationManager.AppSetting["Security:Password"];
 
             /* not going to test if its from swagger, do not do this in production */
             if (Request.Path.Value!= null && Request.Path.Value.StartsWith("/swagger"))

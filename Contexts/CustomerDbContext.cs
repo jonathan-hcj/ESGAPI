@@ -7,11 +7,15 @@ namespace ESGAPI.Contexts
     {
         public DbSet<Customer> Customer { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer("Data Source=JONATHANS_LT\\SQLEXPRESS;Initial Catalog=ESG;Persist Security Info=True;User ID=API1;Password=Blat;Trust Server Certificate=True;");
-
+        public CustomerDbContext(DbContextOptions<CustomerDbContext> options) : base(options) {
         }
 
+        public CustomerDbContext()
+        {
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+        }
      }
 }
