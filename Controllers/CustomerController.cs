@@ -5,13 +5,19 @@ using System.Data.Entity.Infrastructure;
 
 namespace ESGAPI.Controllers
 {
+    /// <summary>
+    /// Manages customer objects
+    /// </summary>
     [ApiController]
     [Route("customer")]
-    public class CustomerController(IConfiguration configuration, CustomerDbContext context) : ControllerBase
+     public class CustomerController(IConfiguration configuration, CustomerDbContext context) : ControllerBase
     {
         private readonly CustomerDbContext customerDbContext = context;
         private readonly IConfiguration configuration = configuration;
 
+        /// <summary>
+        /// Returns a customer object
+        /// </summary>
         [HttpGet(Name = "{reference}")]
         public  ActionResult<Customer> Get(string reference)
         {
@@ -20,6 +26,9 @@ namespace ESGAPI.Controllers
             return customer != null ? customer : NotFound();
         }
 
+        /// <summary>
+        /// Create a customer object
+        /// </summary>
         [HttpPost] 
         public ActionResult<Customer> Post(Customer customer)
         {

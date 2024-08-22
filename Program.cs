@@ -3,6 +3,8 @@ using ESGAPI.Contexts;
 using ESGAPI.Entities;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,12 +21,32 @@ builder.Services.AddAuthentication("BasicAuthentication")
 builder.Services.AddDbContext<CustomerDbContext>(option => 
     option.UseSqlServer(builder.Configuration.GetConnectionString(nameof(Customer))));
 
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Version = "v1",
+        Title = "ESG Dummy API",
+        Description = "An ASP.NET Core Web API for adding and querying customers",
+        Contact = new OpenApiContact
+        {
+            Name = "Contact",
+            Url = new Uri("https://esgglobal.com/contact-2/")
+        },
+    });
+
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    options.IncludeXmlComments(xmlPath);
+});
+
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 { 
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(); 
 }
 else
 {
